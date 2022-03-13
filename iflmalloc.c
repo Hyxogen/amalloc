@@ -15,7 +15,7 @@
 
 #define PUTW(addr, word) (*(unsigned int *)(addr) = (word))
 
-#define NEXT(hdr) ((char *)(hdr) + GETSIZE(hdr) + 1)
+#define NEXT(hdr) ((char *)(hdr) + GETSIZE(hdr))
 
 static void *g_start;
 static void *g_end;
@@ -50,29 +50,34 @@ size_t _split(void *addr, size_t size) {
 		size = GETSIZE(addr);
 	PUTW(addr, PACK(size, 0));
 	if (old - size)
-		PUTW(NEXT(addr), PACK(old - size - 4, 0));
+		PUTW(NEXT(addr), PACK(old - size, 0));
 	return (GETSIZE(addr) - size);
 }
 
 void *amalloc(size_t size) {
 	void *find;
+	size_t block_size;
 
-	if (size < 8)
-		size = 8;
-	find = _find_first_fit(size);
+	block_size = size + 4;
+	if (block_size % 8)
+		block_size += 8 - block_size % 8;
+	find = _find_first_fit(block_size);
 	if (!find)
 		return (NULL);
-	_split(find, size);
+	_split(find, block_size);
 	PUTW(find, PACK(GETSIZE(find), 1));
 	fprintf(stdout, "final size:%u\n", GETSIZE(find));
 	return GETDATA(find);
 }
 
 void afree(void *ptr) {
-	if (GETALLOC(NEXT(ptr)) == 0)
-		PUTW(ptr, PACK(GETSIZE(ptr) + GETSIZE(NEXT(ptr)) + 1, 0));
+	void *hdr;
+
+	hdr = GETHDR(ptr);
+	if (GETALLOC(NEXT(hdr)) == 0)
+		PUTW(hdr, PACK(GETSIZE(hdr) + GETSIZE(NEXT(hdr)), 0));
 	else
-		PUTW(ptr, PACK(GETSIZE(ptr), 0));
+		PUTW(hdr, PACK(GETSIZE(hdr), 0));
 }
 
 void adebug_print(void) {

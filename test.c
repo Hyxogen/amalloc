@@ -3,6 +3,7 @@
 
 int main(void) {
 	int *data, *extra;
+	long *large;
 
 	if (amalloc_init() < 0) {
 		fprintf(stderr, "Failed to init amalloc\n");
@@ -12,6 +13,7 @@ int main(void) {
 	fprintf(stdout, "Initialized\n");
 	data = amalloc(sizeof(int));
 	fprintf(stdout, "first amalloc\n");
+	hexdump();
 	extra = amalloc(sizeof(int));
 	fprintf(stdout, "second amalloc\n");
 	if (data == NULL || extra == NULL) {
@@ -25,6 +27,13 @@ int main(void) {
 	printf("extra (%p):%d\n", (void *) extra, *extra);
 	printf("data (%p):%d\n", (void *) data, *data);
 	hexdump();
+	adebug_print();
 	afree(data);
+	afree(extra);
+	fprintf(stdout, "\n\n");
+	large = amalloc(sizeof(*large));
+	large = amalloc(sizeof(*large));
+	fprintf(stdout, "%p\n", (void*) large);
+	adebug_print();
 	return (0);
 }
