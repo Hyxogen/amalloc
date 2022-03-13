@@ -9,11 +9,13 @@ int main(void) {
 		fprintf(stderr, "Failed to init amalloc\n");
 		return 1;
 	}
+	adebug_print();
 	hexdump();
 	fprintf(stdout, "Initialized\n");
 	data = amalloc(sizeof(int));
 	fprintf(stdout, "first amalloc\n");
 	hexdump();
+	adebug_print();
 	extra = amalloc(sizeof(int));
 	fprintf(stdout, "second amalloc\n");
 	if (data == NULL || extra == NULL) {
