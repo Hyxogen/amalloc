@@ -13,15 +13,16 @@ int main(void) {
 	hexdump();
 	fprintf(stdout, "Initialized\n");
 	data = amalloc(sizeof(int));
+	adebug_print();
 	fprintf(stdout, "first amalloc\n");
 	hexdump();
-	adebug_print();
 	extra = amalloc(sizeof(int));
 	fprintf(stdout, "second amalloc\n");
 	if (data == NULL || extra == NULL) {
 		fprintf(stderr, "Failed to amalloc\n");
 		return 1;
 	}
+	adebug_print();
 	fprintf(stdout, "Done amallocing\n");
 	*data = 42;
 	*extra = 0x1234;
@@ -29,13 +30,15 @@ int main(void) {
 	printf("extra (%p):%d\n", (void *) extra, *extra);
 	printf("data (%p):%d\n", (void *) data, *data);
 	hexdump();
-	adebug_print();
 	afree(data);
+	adebug_print();
+	fprintf(stdout, "Second free\n");
 	afree(extra);
+	adebug_print();
 	fprintf(stdout, "\n\n");
 	large = amalloc(sizeof(*large));
 	large = amalloc(sizeof(*large));
-	fprintf(stdout, "%p\n", (void*) large);
 	adebug_print();
+	fprintf(stdout, "%p\n", (void*) large);
 	return (0);
 }
